@@ -1,104 +1,144 @@
-nslookup - DNS 조회 명령어
+# 🔍 nslookup 정리
 
-도메인 이름과 IP 주소를 확인하고, 다양한 DNS 레코드를 조회하는 명령어입니다.
-네트워크 관리자와 개발자가 DNS 문제를 진단할 때 가장 기본적으로 사용하는 도구예요.
+DNS 조회 도구로, 도메인의 IP 주소나 DNS 레코드를 확인할 때 사용한다.
 
+---
 
-목차
-1. 개요
-2. 기본 사용법
-3. 레코드 타입 조회
-4. 인터랙티브 모드
-5. 실용 예제
-6. 대체 도구
-7. 설치 방법
-
-
-1. 개요
-
-nslookup (Name Server Lookup)은 DNS 서버에 질의하여 도메인 정보를 가져오는 명령줄 도구입니다.
-
-- 정방향 조회: 도메인 → IP 주소
-- 역방향 조회: IP 주소 → 도메인 이름
-- MX, NS, TXT, SOA 등 다양한 DNS 레코드 확인 가능
-- Windows, Linux, macOS 모두 지원
-
-
-2. 기본 사용법
-
-# 기본 조회 (A 레코드)
+## 📌 기본 사용법
+```bash
+nslookup <도메인>
+```
+```bash
+# 예시
 nslookup google.com
+```
 
-# 특정 DNS 서버 지정
-nslookup google.com 8.8.8.8      # Google DNS
-nslookup naver.com 1.1.1.1        # Cloudflare DNS
+---
 
-# 역방향 조회 (IP → 도메인)
-nslookup 8.8.8.8
+## 🛠️ 실무 예제
 
+### 1. 도메인 → IP 조회 (A 레코드)
+```bash
+nslookup google.com
+```
+```
+Server:   8.8.8.8
+Address:  8.8.8.8#53
 
-3. 레코드 타입 조회
+Non-authoritative answer:
+Name:     google.com
+Address:  142.250.196.110
+```
 
-nslookup -type=레코드타입 도메인
+---
 
-레코드 타입 표:
-- A      : IPv4 주소                   → nslookup -type=A google.com
-- AAAA   : IPv6 주소                   → nslookup -type=AAAA google.com
-- MX     : 메일 서버                   → nslookup -type=MX naver.com
-- NS     : 네임 서버                   → nslookup -type=NS google.com
-- TXT    : 텍스트 기록 (SPF, DMARC)    → nslookup -type=TXT google.com
-- CNAME  : 별칭 레코드                 → nslookup -type=CNAME www.naver.com
-- SOA    : 권한 시작 레코드            → nslookup -type=SOA naver.com
+### 2. 특정 DNS 서버 지정해서 조회
+```bash
+nslookup google.com 8.8.8.8        # Google DNS
+nslookup google.com 1.1.1.1        # Cloudflare DNS
+nslookup google.com 168.126.63.1   # KT DNS
+```
 
-디버그 모드:
-nslookup -debug google.com
+> 내부 DNS와 외부 DNS 결과가 다를 때 원인 파악에 유용하다.
 
+---
 
-4. 인터랙티브 모드
+### 3. 역방향 조회 (IP → 도메인)
+```bash
+nslookup 142.250.196.110
+```
+```
+Non-authoritative answer:
+110.196.250.142.in-addr.arpa  name = nrt12s36-in-f14.1e100.net.
+```
 
-nslookup
+---
 
-> server 8.8.8.8          # DNS 서버 변경
-> set type=mx             # 조회할 레코드 타입 설정
-> naver.com               # 조회 실행
-> exit                    # 종료
+### 4. 레코드 타입 지정 조회
+```bash
+# MX 레코드 (메일 서버)
+nslookup -type=MX gmail.com
 
+# NS 레코드 (네임서버)
+nslookup -type=NS google.com
 
-5. 실용 예제
+# TXT 레코드 (SPF, DKIM 등)
+nslookup -type=TXT google.com
 
-# 메일 서버 확인
-nslookup -type=mx gmail.com
+# CNAME 레코드
+nslookup -type=CNAME www.github.com
 
-# 네임서버 확인
-nslookup -type=ns daum.net
+# A 레코드 (기본값)
+nslookup -type=A google.com
 
-# SPF 레코드 확인
-nslookup -type=txt _spf.google.com
+# AAAA 레코드 (IPv6)
+nslookup -type=AAAA google.com
 
-# TXT 레코드 전체 확인
-nslookup -type=txt google.com
+# SOA 레코드
+nslookup -type=SOA google.com
 
+# ANY (모든 레코드)
+nslookup -type=ANY google.com
+```
 
-6. 대체 도구
+---
 
-도구       특징                              추천 상황
-nslookup   Windows에서 편리, 인터랙티브 강점   빠른 확인, 초보자
-dig        출력이 가장 자세하고 구조적         전문가, 상세 분석
-host       가장 간단하고 깔끔함                빠른 한 줄 조회
+### 5. 인터랙티브 모드
+```bash
+nslookup        # 명령어만 입력하면 인터랙티브 모드 진입
+```
+```
+> server 8.8.8.8       # DNS 서버 변경
+> set type=MX          # 레코드 타입 변경
+> gmail.com            # 조회
+> exit                 # 종료
+```
 
-dig 예시:
-dig google.com MX
-dig +short naver.com NS
+---
 
+### 6. 실무 활용 시나리오
 
-7. 설치 방법
+#### 🔸 도메인 연결 확인 (배포 후 DNS 전파 확인)
+```bash
+nslookup mysite.com
+nslookup mysite.com 8.8.8.8   # 외부에서도 확인
+```
 
-- Windows: 명령 프롬프트에 기본 설치되어 있음
+#### 🔸 메일 발송 문제 디버깅
+```bash
+nslookup -type=MX company.com
+nslookup -type=TXT company.com   # SPF 레코드 확인
+```
 
-- Ubuntu / Debian:
-  sudo apt install dnsutils -y
+#### 🔸 CDN / CNAME 체인 확인
+```bash
+nslookup -type=CNAME cdn.mysite.com
+```
 
-- Fedora / RHEL / CentOS:
-  sudo dnf install bind-utils -y
+#### 🔸 내부 DNS vs 외부 DNS 비교
+```bash
+nslookup internal.company.com 192.168.1.1    # 내부 DNS
+nslookup internal.company.com 8.8.8.8        # 외부 DNS
+```
 
-- macOS: 대부분 기본 설치됨 (없으면 brew install bind)
+---
+
+## ⚠️ 참고 사항
+
+| 항목 | 설명 |
+|------|------|
+| Non-authoritative answer | 캐시된 응답 (권한 없는 서버에서 반환) |
+| Authoritative answer | 해당 도메인을 관리하는 서버에서 직접 반환 |
+| TTL | DNS 캐시 유지 시간 (초 단위) |
+| DNS 전파 시간 | 변경 후 전 세계 반영까지 최대 48시간 소요 |
+
+---
+
+## 🔗 관련 명령어
+```bash
+dig google.com          # nslookup보다 상세한 DNS 조회 (Linux/Mac)
+host google.com         # 간단한 DNS 조회
+ping google.com         # 연결 및 응답 속도 확인
+ipconfig /flushdns      # DNS 캐시 초기화 (Windows)
+sudo dscacheutil -flushcache  # DNS 캐시 초기화 (Mac)
+```
