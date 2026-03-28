@@ -1,4 +1,4 @@
-# 🔍 nslookup 정리
+# 🔍 [nslookup] 도메인의 IP 주소나 DNS 레코드를 확인
 
 DNS 조회 도구로, 도메인의 IP 주소나 DNS 레코드를 확인할 때 사용한다.
 
