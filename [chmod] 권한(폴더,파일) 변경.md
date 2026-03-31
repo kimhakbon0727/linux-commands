@@ -16,11 +16,12 @@ chmod [옵션] 권한 파일명
 ## 🧩 권한 구조 이해
 
 ```
--rwxr-xr--  1 user group 1234 Mar 31 15:00 script.sh
- ↑↑↑↑↑↑↑↑↑
- │└──┬──┘└──┬──┘└──┬──┘
- │  소유자   그룹   others
- │  (user)  (group)
+ -  rwx     r-x    r--  1 user group 1234 Mar 31 15:00 script.sh
+ ↑  ↑↑↑     ↑↑↑    ↑↑↑
+ │  └┬┘     └┬┘    └┬┘
+ │ 소유자   그룹    그외
+ │ (user) (group)
+ │
  └ 파일 타입 (- 파일 / d 디렉토리 / l 심볼릭링크)
 ```
 
